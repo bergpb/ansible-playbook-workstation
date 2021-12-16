@@ -34,6 +34,7 @@
           - krita
           - jq
           - mtr
+      tags: common
 
     - block:
       - name: Verify if Oh-My-zsh is installed
@@ -65,6 +66,7 @@
           path: /home/{{ ansible_user_id }}/.zshrc
           line: 'autoload -U compinit && compinit'
           state: present
+    tags: zsh
 
     - name: Installing AWS CLI via pip3
       become: true
@@ -88,14 +90,16 @@
         become: true
         apt:
           name: google-chrome-stable
+    tags: chrome
 
     - block:
-      - name: Installing Vagrant 2.2.15
+      - name: Installing Vagrant 2.2.19
         become: true
         unarchive:
-          src: 'https://releases.hashicorp.com/vagrant/2.2.15/vagrant_2.2.15_linux_amd64.zip'
+          src: 'https://releases.hashicorp.com/vagrant/2.2.19/vagrant_2.2.19_linux_amd64.zip'
           dest: /usr/local/bin
           remote_src: yes
+    tags: vagrant
 
     - block:
       - name: Installing Terraform 0.12.30
@@ -134,6 +138,7 @@
       - name: Renaming terraform15 binary
         become: true
         command: mv /usr/local/bin/terraform /usr/local/bin/terraform15
+    tags: terraform
 
     - block:
       - name: Installing Vault 1.7.1
@@ -142,6 +147,7 @@
           src: 'https://releases.hashicorp.com/vault/1.7.1/vault_1.7.1_linux_amd64.zip'
           dest: /usr/local/bin
           remote_src: yes
+    tags: vault
 
     - block:
       - name: Installing gomplate 3.7.0
@@ -151,6 +157,7 @@
           dest: /usr/local/bin/gomplate
           mode: 755
           remote_src: yes
+    tags: gotemplate
 
     - block:
       - name: Installing Stern 1.11.0
@@ -160,6 +167,7 @@
           dest: /usr/local/bin/stern
           mode: 755
           remote_src: yes
+    tags: stern
 
     - block:
       - name: Install Google Cloud SDK Key
@@ -177,6 +185,7 @@
         become: true
         apt:
           name: google-cloud-sdk
+    tags: google-cloud
 
           
     - block:
@@ -206,6 +215,7 @@
           - gruntfuggly.todo-tree
           - njpwerner.autodocstring
           - eamodio.gitlens
+    tags: vscode
 
     - block: 
       - name: Install Docker Key
@@ -253,6 +263,7 @@
           path: /home/{{ ansible_user_id }}/.zshrc
           regexp: '^plugins='
           line: 'plugins=(git docker docker-compose)'
+    tags: docker
         
     - block:
       - name: Installing Kubectl 1.21.0
@@ -283,7 +294,8 @@
           state: link
         with_items:
           - kubectx.zsh
-          - kubens.zsh 
+          - kubens.zsh
+    tags: kubectl
           
     - block:
       - name: Adding Longsleep/Golang Backports Repository
@@ -294,6 +306,7 @@
         become: true
         apt:
           name: golang-go
+    tags: golang
           
 # OPTIONAL:
 #  - PEEK - Lightweight Screen Recorder that can export as GIF
@@ -310,6 +323,7 @@
         become: true
         apt:
           name: peek
+    tags: peek
 
     - block:
       - name: Install obsproject Ubuntu Repo
@@ -320,6 +334,7 @@
         become: true
         apt:
           name: obs-studio
+    tags: obs
 
     - block: 
       - name: Install Brave Key
@@ -337,6 +352,7 @@
         become: true
         apt:
           name: brave-browser
+    tags: brave
 
     - block:
       - name: Adding Ulauncher Repository
@@ -347,3 +363,4 @@
         become: true
         apt:
           name: ulauncher
+    tags: ulancher
