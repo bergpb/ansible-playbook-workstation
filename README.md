@@ -21,7 +21,7 @@ git clone https://github.com/caiodelgadonew/tools.git
 
 3. Apply the configuration
 ```bash
-ansible-playbook tools/ubuntu.yml --ask-become-pass
+ansible-playbook ubuntu.yml --tags "common,zsh,chrome,vagrant,vscode,docker" --ask-become-pass
 ```
 >Type your password when asked to give root permissions for some actions.
 ___
