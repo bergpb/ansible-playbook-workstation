@@ -34,6 +34,8 @@
           - krita
           - jq
           - mtr
+          - solaar
+          - telegram-desktop
       tags: common
 
     - block:
@@ -121,7 +123,6 @@
           - bbenoist.vagrant
           - bmewburn.vscode-intelephense-client
           - codezombiech.gitignore
-          - CoenraadS.bracket-pair-colorizer-2
           - dracula-theme.theme-dracula
           - eamodio.gitlens
           - esbenp.prettier-vscode
@@ -146,7 +147,6 @@
           - rebornix.ruby
           - redhat.vscode-yaml
           - sianglim.slim
-          - tomaciazek.ansible
           - whatwedo.twig
           - wingrunr21.vscode-ruby 
       tags: vscode
@@ -186,7 +186,6 @@
           
 # OPTIONAL:
 # - Brave Browser - Secure web browser
-
     - block: 
       - name: Install Brave Key
         become: true
