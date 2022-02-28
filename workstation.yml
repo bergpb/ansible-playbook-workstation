@@ -38,6 +38,7 @@
           - deluge
           - sqlite3
           - highlight
+          - rar
       tags: common
 
     - block:
