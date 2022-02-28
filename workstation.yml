@@ -31,11 +31,11 @@
           - tilix
           - virtualbox
           - mlocate
-          - krita
           - jq
           - mtr
           - solaar
           - telegram-desktop
+          - deluge
       tags: common
 
     - block:
@@ -50,14 +50,23 @@
         when: ohmyzsh.rc != 0
       - name: Changing Default Shell to ZSH
         become: yes
-        user: 
+        user:
           name: '{{ ansible_user_id }}'
-          shell: /bin/zsh 
+          shell: /bin/zsh
       - name: Changing Default ZSH Theme to Agnoster
         lineinfile:
           path: /home/{{ ansible_user_id }}/.zshrc
           regexp: '^ZSH_THEME='
           line: 'ZSH_THEME="agnoster"'
+      - name: Clone zsh-autosuggestions repository
+        ansible.builtin.git:
+          repo: 'https://github.com/zsh-users/zsh-autosuggestions'
+          dest: ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+      - name: Add zsh-autosuggestions on ZSH plugins
+        lineinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          regexp: '^plugins='
+          line: 'plugins=(git zsh-autosuggestions)'
       - name: Creating ZSH Completion folder
         file:
           path: /home/{{ ansible_user_id }}/.oh-my-zsh/completions
@@ -71,9 +80,67 @@
       tags: zsh
 
     - block:
+      - name: Download NVM installer
+        get_url:
+          url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh
+          dest: /tmp/nvm_install.sh
+      - name: Install NVM installer
+        shell:
+          cmd: /tmp/nvm_install.sh
+          creates: "/home/{{ ansible_user_id }}/.nvm/nvm.sh"
+        args:
+          executable: /bin/bash
+      - name: Add NVM into ZSH
+        blockinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          block: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+          marker: "# {mark} ANSIBLE MANAGED BLOCK NVM"
+      # - name: Install Node with NVM
+      #   shell:
+      #     cmd: nvm install node
+      #   args:
+      #     executable: /bin/bash
+      #     chdir: "$HOME"
+      tags: nvm
+
+    - block:
+      - name: Copy .bash_helpers to home directory
+        copy:
+          src: .bash_helpers
+          dest: /home/{{ ansible_user_id }}/.bash_helpers
+          mode: u=rw,g=r,o=r
+
+      - name: Add VTE content in .zshrc file
+        blockinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          block: |
+            if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+                source /etc/profile.d/vte-2.91.sh
+            fi
+          marker: "# {mark} ANSIBLE MANAGED BLOCK VTE"
+
+      - name: Add custom content in .zshrc file
+        blockinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          block: |
+            # set PATH so it includes user's private ~/.local/bin if it exists
+            if [ -d "$HOME/.local/bin" ] ; then
+                PATH="$HOME/.local/bin:$PATH"
+            fi
+
+            if [ -f ~/.bash_helpers ]; then
+                . ~/.bash_helpers
+            fi
+          marker: "# {mark} ANSIBLE MANAGED BLOCK CUSTOM"
+      tags: bash
+
+    - block:
       - name: Install Google Key
         become: true
-        apt_key: 
+        apt_key:
           url: 'https://dl.google.com/linux/linux_signing_key.pub'
           state: present
       - name: Install Google Repository
@@ -96,7 +163,7 @@
           dest: /usr/local/bin
           remote_src: yes
       tags: vagrant
-          
+
     - block:
       - name: Install Microsoft Key
         become: true
@@ -115,7 +182,7 @@
           name: code
       - name: Install Virtual Studio Code Extensions
         shell:
-          cmd: code --install-extension '{{ item }}' 
+          cmd: code --install-extension '{{ item }}'
         loop:
           - aaron-bond.better-comments
           - alexcvzz.vscode-sqlite
@@ -148,10 +215,10 @@
           - redhat.vscode-yaml
           - sianglim.slim
           - whatwedo.twig
-          - wingrunr21.vscode-ruby 
+          - wingrunr21.vscode-ruby
       tags: vscode
 
-    - block: 
+    - block:
       - name: Install Docker Key
         become: true
         apt_key:
@@ -169,9 +236,9 @@
           name: docker-ce
       - name: Adding existing user to group Docker
         become: yes
-        user: 
+        user:
           name: '{{ ansible_user_id }}'
-          groups: docker 
+          groups: docker
           append: yes
       - name: Creating .docker folder
         file:
@@ -182,11 +249,39 @@
         get_url:
           url: https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64
           dest: /home/{{ ansible_user_id }}/.docker/cli-plugins/docker-compose
+          mode: 0755
       tags: docker
-          
+
+    - block:
+      - name: Add PHP 7.4 apt repository
+        become: yes
+        apt_repository:
+          repo: ppa:ondrej/php
+      - name: Install PHP 7.4 required packages
+        become: yes
+        apt:
+          name: '{{ item }}'
+          update_cache: yes
+          state: present
+        loop:
+          - php7.4-cli
+          - php7.4-opcache
+          - php7.4-mbstring
+          - php7.4-curl
+      - name: Download script to install Composer
+        become: yes
+        get_url:
+          url: https://getcomposer.org/installer
+          dest: /tmp/composer-setup.php
+      - name: Install Composer
+        become: yes
+        command:
+          cmd: php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+      tags: php
+
 # OPTIONAL:
 # - Brave Browser - Secure web browser
-    - block: 
+    - block:
       - name: Install Brave Key
         become: true
         apt_key:
