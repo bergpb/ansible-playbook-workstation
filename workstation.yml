@@ -36,6 +36,8 @@
           - solaar
           - telegram-desktop
           - deluge
+          - sqlite3
+          - highlight
       tags: common
 
     - block:
@@ -53,11 +55,11 @@
         user:
           name: '{{ ansible_user_id }}'
           shell: /bin/zsh
-      - name: Changing Default ZSH Theme to Agnoster
+      - name: Changing Default ZSH Theme to bira
         lineinfile:
           path: /home/{{ ansible_user_id }}/.zshrc
           regexp: '^ZSH_THEME='
-          line: 'ZSH_THEME="agnoster"'
+          line: 'ZSH_THEME="bira"'
       - name: Clone zsh-autosuggestions repository
         ansible.builtin.git:
           repo: 'https://github.com/zsh-users/zsh-autosuggestions'
@@ -112,6 +114,13 @@
           src: .bash_helpers
           dest: /home/{{ ansible_user_id }}/.bash_helpers
           mode: u=rw,g=r,o=r
+
+      - name: Replace cat with highlight
+        blockinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          block: |
+            alias cat="highlight -O ansi --force"
+          marker: "# {mark} ANSIBLE MANAGED BLOCK HIGHLIGHT"
 
       - name: Add VTE content in .zshrc file
         blockinfile:
