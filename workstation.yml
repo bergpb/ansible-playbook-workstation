@@ -61,7 +61,7 @@
       - name: Clone zsh-autosuggestions repository
         ansible.builtin.git:
           repo: 'https://github.com/zsh-users/zsh-autosuggestions'
-          dest: ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+          dest: /home/{{ ansible_user_id }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
       - name: Add zsh-autosuggestions on ZSH plugins
         lineinfile:
           path: /home/{{ ansible_user_id }}/.zshrc
