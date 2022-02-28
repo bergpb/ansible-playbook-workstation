@@ -1,5 +1,5 @@
-funcion con(){
-    case $1 in 
+function con(){
+    case $1 in
     lisa)
         ssh pi@192.168.6.100
     ;;
