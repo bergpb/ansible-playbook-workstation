@@ -2,13 +2,13 @@
 
 This repository contains scripts to automate and speedup the workflow and preparation for my machine.
 
-> **_Disclaimer_** :  
+> **_Disclaimer_** :
 > Those scripts are ubuntu related with major version 18+, for other distributions you'll need to adapt it
 ___
 
 ## Prepare Workstation
 
-> Read the `linux.yml` file before applying and be sure to understand everything that will be done.
+> Read the `workstation.yml` file before applying and be sure to understand everything that will be done.
 
 1. Install Ansible
 ```bash
@@ -21,7 +21,7 @@ git clone https://github.com/bergpb/ansible-playbook-workstation.git
 
 3. Apply the configuration
 ```bash
-ansible-playbook ubuntu.yml --tags "common,zsh,vagrant,vscode,docker,brave" --ask-become-pass
+ansible-playbook workstation.yml --skip-tags "chrome,brave" --ask-become-pass
 ```
 >Type your password when asked to give root permissions for some actions.
 ___
@@ -31,5 +31,6 @@ GPLv3
 
 # Author Information
 Created by [Caio Delgado](https://linktr.ee/caiodelgadonew)
+Edit by [@bergpb](https://twitter.com/lbergpb)
 
 Contributions are more than welcome!
