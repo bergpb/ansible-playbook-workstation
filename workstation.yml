@@ -39,6 +39,7 @@
           - sqlite3
           - highlight
           - rar
+          - vlc
       tags: common
 
     - block:
