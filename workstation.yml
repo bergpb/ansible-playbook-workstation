@@ -3,14 +3,14 @@
   hosts: localhost
   connection: local
   tasks:
-
-    - name: Installing Linux Apps
-      become: true
-      apt:
-        name: '{{ item }}'
-        install_recommends: yes
-        state: present
-      loop:
+    - block:
+      - name: Installing Linux Apps
+        become: true
+        apt:
+          name: '{{ item }}'
+          install_recommends: yes
+          state: present
+        loop:
           - vim
           - htop
           - curl
@@ -30,17 +30,64 @@
           - fonts-hack
           - tilix
           - virtualbox
-          - mlocate
+          - plocate
           - jq
           - mtr
-          - solaar
           - telegram-desktop
           - deluge
           - sqlite3
-          - highlight
-          - rar
           - vlc
+          - bottom
+          - bat
+          - libarchive-tools
+
+      - name: Install deb package from source
+        become: true
+        apt:
+          deb: '{{ item }}'
+        loop:
+          - https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
+          - https://github.com/Kong/insomnia/releases/download/core%402022.3.0/Insomnia.Core-2022.3.0.deb
+          - https://github.com/antares-sql/antares/releases/download/v0.5.5/Antares-0.5.5-linux_amd64.deb
       tags: common
+
+    - block:
+      - name: Install Google Key
+        become: true
+        apt_key:
+          url: 'https://dl.google.com/linux/linux_signing_key.pub'
+          state: present
+      - name: Install Google Repository
+        become: true
+        apt_repository:
+          repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
+          state: present
+          filename: google-chrome
+      - name: Install Google Chrome
+        become: true
+        apt:
+          name: google-chrome-stable
+          update_cache: true
+      tags: chrome
+
+    - block:
+      - name: Install Spotify Key
+        become: true
+        apt_key:
+          url: 'https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg'
+          state: present
+      - name: Install Spotify Repository
+        become: true
+        apt_repository:
+          repo: 'deb http://repository.spotify.com stable non-free'
+          state: present
+          filename: google-chrome
+      - name: Install Spotify
+        become: true
+        apt:
+          name: spotify-client
+          update_cache: true
+      tags: spotify
 
     - block:
       - name: Verify if Oh-My-zsh is installed
@@ -117,11 +164,17 @@
           dest: /home/{{ ansible_user_id }}/.bash_helpers
           mode: u=rw,g=r,o=r
 
-      - name: Replace cat with highlight
+      - name: Create a batcat symlink
+        file:
+          src: /usr/bin/batcat
+          dest: ~/.local/bin/bat
+          state: link
+
+      - name: Add a highlight alias
         blockinfile:
           path: /home/{{ ansible_user_id }}/.zshrc
           block: |
-            alias cat="highlight -O ansi --force"
+            alias highlight="highlight -O ansi --force"
           marker: "# {mark} ANSIBLE MANAGED BLOCK HIGHLIGHT"
 
       - name: Add VTE content in .zshrc file
@@ -146,25 +199,7 @@
                 . ~/.bash_helpers
             fi
           marker: "# {mark} ANSIBLE MANAGED BLOCK CUSTOM"
-      tags: bash
-
-    - block:
-      - name: Install Google Key
-        become: true
-        apt_key:
-          url: 'https://dl.google.com/linux/linux_signing_key.pub'
-          state: present
-      - name: Install Google Repository
-        become: true
-        apt_repository:
-          repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
-          state: present
-          filename: google-chrome
-      - name: Install Google Chrome
-        become: true
-        apt:
-          name: google-chrome-stable
-      tags: chrome
+      tags: shell
 
     - block:
       - name: Installing Vagrant 2.2.19
@@ -194,6 +229,8 @@
       - name: Install Virtual Studio Code Extensions
         shell:
           cmd: code --install-extension '{{ item }}'
+        register: code_extensions
+        changed_when: "'already installed' not in code_extensions.stdout"
         loop:
           - aaron-bond.better-comments
           - alexcvzz.vscode-sqlite
@@ -203,6 +240,7 @@
           - codezombiech.gitignore
           - dracula-theme.theme-dracula
           - eamodio.gitlens
+          - ekelley.midnight-synth
           - esbenp.prettier-vscode
           - Gruntfuggly.todo-tree
           - hashicorp.terraform
@@ -211,9 +249,6 @@
           - ms-azuretools.vscode-docker
           - ms-python.python
           - ms-python.vscode-pylance
-          - ms-toolsai.jupyter
-          - ms-toolsai.jupyter-keymap
-          - ms-toolsai.jupyter-renderers
           - ms-vscode-remote.remote-containers
           - ms-vscode.test-adapter-converter
           - njpwerner.autodocstring
@@ -222,12 +257,14 @@
           - Perkovec.emoji
           - phplasma.csv-to-table
           - PKief.material-icon-theme
+          - rangav.vscode-thunder-client
           - rebornix.ruby
           - redhat.vscode-yaml
+          - RobbOwen.synthwave-vscode
           - sianglim.slim
           - whatwedo.twig
           - wingrunr21.vscode-ruby
-      tags: vscode
+      tags: code
 
     - block:
       - name: Install Docker Key
@@ -258,7 +295,7 @@
           mode: 0755
       - name: Download docker-compose go binary
         get_url:
-          url: https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64
+          url: https://github.com/docker/compose/releases/download/v2.5.1/docker-compose-linux-x86_64
           dest: /home/{{ ansible_user_id }}/.docker/cli-plugins/docker-compose
           mode: 0755
       tags: docker
@@ -279,19 +316,25 @@
           - php7.4-opcache
           - php7.4-mbstring
           - php7.4-curl
-      - name: Download script to install Composer
-        become: yes
-        get_url:
-          url: https://getcomposer.org/installer
-          dest: /tmp/composer-setup.php
-      - name: Install Composer
-        become: yes
-        command:
-          cmd: php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+      - name: Verify if composer is already installed
+        command: test -f /usr/local/bin/composer
+        register: composer
+        ignore_errors: true
+      - block:
+        - name: Download script to install Composer
+          become: yes
+          get_url:
+            url: https://getcomposer.org/installer
+            dest: /tmp/composer-setup.php
+        - name: Install Composer
+          become: yes
+          command:
+            cmd: php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+        when: composer.rc != 0
       tags: php
 
-# OPTIONAL:
-# - Brave Browser - Secure web browser
+    # OPTIONAL:
+    # - Brave Browser - Secure web browser
     - block:
       - name: Install Brave Key
         become: true
