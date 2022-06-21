@@ -1,0 +1,42 @@
+---
+  - block:
+    - name: Install Docker Key
+      become: true
+      apt_key:
+        url: 'https://download.docker.com/linux/ubuntu/gpg'
+        state: present
+
+    - name: Install Docker Repository
+      become: true
+      apt_repository:
+        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
+        state: present
+        filename: docker-ce
+
+    - name: Install Docker
+      become: true
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Adding existing user to group Docker
+      become: true
+      user:
+        name: '{{ ansible_user_id }}'
+        groups: docker
+        append: yes
+
+    - name: Creating .docker folder
+      file:
+        path: /home/{{ ansible_user_id }}/.docker/cli-plugins
+        state: directory
+        mode: 0755
+
+    - name: Download docker-compose go binary
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.6.0/docker-compose-linux-{{ ansible_machine }}
+        dest: /home/{{ ansible_user_id }}/.docker/cli-plugins/docker-compose
+        mode: 0755
+        force: yes
+
+    tags: docker

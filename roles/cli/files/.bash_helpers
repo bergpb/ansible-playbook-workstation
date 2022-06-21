@@ -1,0 +1,24 @@
+function con(){
+    case $1 in
+    sophia)
+        ssh pi@192.168.6.112
+    ;;
+    rachel)
+        ssh pi@192.168.6.113
+    ;;
+    cubie)
+        ssh cubie@192.168.6.111
+    ;;
+    anna)
+        ssh pi@192.168.6.110
+    ;;
+    integrator)
+        ssh -i ~/lbarbosa root@162.240.14.34
+    ;;
+    lbarbosa)
+        ssh -i ~/lbarbosa lbarbosa@162.240.14.34
+    ;;
+    *)
+        echo 'Usage con [device]'
+    esac
+}

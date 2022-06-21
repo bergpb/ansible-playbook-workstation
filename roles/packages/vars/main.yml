@@ -1,0 +1,36 @@
+---
+apt_packages:
+  - vim
+  - htop
+  - curl
+  - wget
+  - ncdu
+  - tree
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - python3-pip
+  - make
+  - git
+  - bash-completion
+  - gnupg-agent
+  - zsh
+  - flameshot
+  - fonts-hack
+  - tilix
+  - virtualbox
+  - plocate
+  - jq
+  - mtr
+  - telegram-desktop
+  - deluge
+  - sqlite3
+  - vlc
+  - bottom
+  - bat
+  - libarchive-tools
+
+deb_packages:
+  - https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
+  - https://github.com/Kong/insomnia/releases/download/core%402022.3.0/Insomnia.Core-2022.3.0.deb
+  - https://github.com/antares-sql/antares/releases/download/v0.5.7/Antares-0.5.7-linux_amd64.deb

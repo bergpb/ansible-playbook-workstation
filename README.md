@@ -23,14 +23,24 @@ git clone https://github.com/bergpb/ansible-playbook-workstation.git
 ```bash
 ansible-playbook workstation.yml --skip-tags "chrome,brave" --ask-become-pass
 ```
+
 >Type your password when asked to give root permissions for some actions.
+
+
+### Tags that can be used in playbook:
+    - packages
+    - php7.4
+    - cli
+    - docker
+    - vscode
+    - browsers (chrome or brave)
 ___
 
 # License
 GPLv3
 
 # Author Information
-Created by [Caio Delgado](https://linktr.ee/caiodelgadonew)
+Created by [Caio Delgado](https://linktr.ee/caiodelgadonew)  
 Edit by [@bergpb](https://twitter.com/lbergpb)
 
 Contributions are more than welcome!

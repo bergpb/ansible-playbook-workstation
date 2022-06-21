@@ -1,0 +1,34 @@
+---
+extensions:
+  - aaron-bond.better-comments
+  - alexcvzz.vscode-sqlite
+  - ask-toolkit.alexa-skills-kit-toolkit
+  - bbenoist.vagrant
+  - bmewburn.vscode-intelephense-client
+  - codezombiech.gitignore
+  - dracula-theme.theme-dracula
+  - eamodio.gitlens
+  - ekelley.midnight-synth
+  - esbenp.prettier-vscode
+  - Gruntfuggly.todo-tree
+  - hashicorp.terraform
+  - hbenl.vscode-test-explorer
+  - mhutchie.git-graph
+  - ms-azuretools.vscode-docker
+  - ms-python.python
+  - ms-python.vscode-pylance
+  - ms-vscode-remote.remote-containers
+  - ms-vscode.test-adapter-converter
+  - njpwerner.autodocstring
+  - oderwat.indent-rainbow
+  - p1c2u.docker-compose
+  - Perkovec.emoji
+  - phplasma.csv-to-table
+  - PKief.material-icon-theme
+  - rangav.vscode-thunder-client
+  - rebornix.ruby
+  - redhat.vscode-yaml
+  - RobbOwen.synthwave-vscode
+  - sianglim.slim
+  - whatwedo.twig
+  - wingrunr21.vscode-ruby
