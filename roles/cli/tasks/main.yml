@@ -46,33 +46,6 @@
         line: 'autoload -U compinit && compinit'
         state: present
 
-    - name: Download NVM installer
-      get_url:
-        url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh
-        dest: /tmp/nvm_install.sh
-
-    - name: Install NVM installer
-      shell:
-        cmd: /tmp/nvm_install.sh
-        creates: "/home/{{ ansible_user_id }}/.nvm/nvm.sh"
-      args:
-        executable: /bin/bash
-
-    - name: Add NVM into ZSH
-      blockinfile:
-        path: /home/{{ ansible_user_id }}/.zshrc
-        block: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-        marker: "# {mark} ANSIBLE MANAGED BLOCK NVM"
-    # - name: Install Node with NVM
-    #   shell:
-    #     cmd: nvm install node
-    #   args:
-    #     executable: /bin/bash
-    #     chdir: "$HOME"
-
     - name: Copy .bash_helpers to home directory
       copy:
         src: files/.bash_helpers
@@ -84,13 +57,6 @@
         src: /usr/bin/batcat
         dest: ~/.local/bin/bat
         state: link
-
-    - name: Add a highlight alias
-      blockinfile:
-        path: /home/{{ ansible_user_id }}/.zshrc
-        block: |
-          alias highlight="highlight -O ansi --force"
-        marker: "# {mark} ANSIBLE MANAGED BLOCK HIGHLIGHT"
 
     - name: Add VTE content in .zshrc file
       blockinfile:
