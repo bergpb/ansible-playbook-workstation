@@ -6,16 +6,15 @@
       name: '{{ item }}'
       install_recommends: yes
       state: present
-    loop:
-      - "{{ apt_packages }}"
+    loop: "{{ apt_packages }}" # install packages one by one
+      # - "{{ apt_packages }}" # install all packages at once
 
   - name: Install deb package from source
     become: true
     apt:
       deb: '{{ item }}'
       state: present
-    loop:
-      - "{{ deb_packages }}"
+    loop: "{{ deb_packages }}"
 
   - name: Install Spotify Key
     become: true
