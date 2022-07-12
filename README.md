@@ -32,7 +32,7 @@ ansible-playbook workstation.yml --skip-tags "chrome,brave" --ask-become-pass
     - php7.4
     - cli
     - docker
-    - vscode
+    - vscodium
     - browsers (chrome or brave)
 ___
 
