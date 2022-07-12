@@ -8,16 +8,21 @@ extensions:
   - codezombiech.gitignore
   - dracula-theme.theme-dracula
   - eamodio.gitlens
+  - EditorConfig.EditorConfig
   - ekelley.midnight-synth
   - esbenp.prettier-vscode
+  - golang.go
   - Gruntfuggly.todo-tree
   - hashicorp.terraform
   - hbenl.vscode-test-explorer
   - mhutchie.git-graph
+  - mikestead.dotenv
   - ms-azuretools.vscode-docker
   - ms-python.python
   - ms-python.vscode-pylance
   - ms-vscode-remote.remote-containers
+  - ms-vscode.cpptools
+  - ms-vscode.makefile-tools
   - ms-vscode.test-adapter-converter
   - njpwerner.autodocstring
   - oderwat.indent-rainbow
@@ -31,4 +36,6 @@ extensions:
   - RobbOwen.synthwave-vscode
   - sianglim.slim
   - whatwedo.twig
+  - wholroyd.jinja
   - wingrunr21.vscode-ruby
+  - xdebug.php-debug

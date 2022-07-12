@@ -1,0 +1,16 @@
+---
+  - block:
+    - name: Install Visual Studio Code
+      become: true
+      apt:
+        deb: https://github.com/VSCodium/vscodium/releases/download/1.69.0/codium_1.69.0-1657241063_amd64.deb
+        state: present
+
+    - name: Install VSCodium Extensions
+      shell:
+        cmd: codium --install-extension '{{ item }}'
+      register: vscodium_extensions
+      changed_when: "'already installed' not in vscodium_extensions.stdout"
+      loop: "{{ extensions }}"
+
+    tags: vscodium
