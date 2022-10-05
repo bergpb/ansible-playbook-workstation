@@ -85,7 +85,7 @@
       become: true
       unarchive:
         src: "https://releases.hashicorp.com/vagrant/{{ vagrant_version }}/vagrant_{{ vagrant_version }}_linux_amd64.zip"
-        dest: /usr/local/bin
+        dest: /usr/local/bin/vagrant
         remote_src: yes
 
     - name: Installing ctop
