@@ -81,11 +81,18 @@
           fi
         marker: "# {mark} ANSIBLE MANAGED BLOCK CUSTOM"
 
-    - name: Installing Vagrant 2.2.19
+    - name: Installing Vagrant {{ vagrant_version }}
       become: true
       unarchive:
-        src: 'https://releases.hashicorp.com/vagrant/2.2.19/vagrant_2.2.19_linux_amd64.zip'
+        src: "https://releases.hashicorp.com/vagrant/{{ vagrant_version }}/vagrant_{{ vagrant_version }}_linux_amd64.zip"
         dest: /usr/local/bin
         remote_src: yes
+
+    - name: Installing ctop
+      become: true
+      get_url:
+        url: "https://github.com/bcicen/ctop/releases/download/v{{ ctop_version }}/ctop-{{ ctop_version }}-linux-amd64"
+        dest: /usr/local/bin/ctop
+        mode: 0755
 
     tags: cli

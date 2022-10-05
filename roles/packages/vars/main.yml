@@ -31,6 +31,8 @@ apt_packages:
   - libarchive-tools
   - neofetch
   - btop
+  - httpie
+  - nala
 
 deb_packages:
   - https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
