@@ -21,7 +21,7 @@ git clone https://github.com/bergpb/ansible-playbook-workstation.git
 
 3. Apply the configuration
 ```bash
-ansible-playbook workstation.yml --skip-tags "chrome,brave" --ask-become-pass
+ansible-playbook workstation.yml --skip-tags chrome,brave --ask-become-pass
 ```
 
 >Type your password when asked to give root permissions for some actions.
@@ -40,7 +40,7 @@ ___
 GPLv3
 
 # Author Information
-Created by [Caio Delgado](https://linktr.ee/caiodelgadonew)  
+Created by [Caio Delgado](https://linktr.ee/caiodelgadonew)
 Edit by [@bergpb](https://twitter.com/lbergpb)
 
 Contributions are more than welcome!
