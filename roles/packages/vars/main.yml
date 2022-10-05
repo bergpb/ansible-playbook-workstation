@@ -29,6 +29,8 @@ apt_packages:
   - bottom
   - bat
   - libarchive-tools
+  - neofetch
+  - btop
 
 deb_packages:
   - https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
