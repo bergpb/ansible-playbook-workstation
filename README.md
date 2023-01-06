@@ -34,6 +34,7 @@ ansible-playbook workstation.yml --skip-tags chrome,brave --ask-become-pass
     - docker
     - vscodium
     - browsers (chrome or brave)
+    - polybar
 ___
 
 # License
