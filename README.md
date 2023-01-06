@@ -40,7 +40,7 @@ ___
 GPLv3
 
 # Author Information
-Created by [Caio Delgado](https://linktr.ee/caiodelgadonew)
+Created by [Caio Delgado](https://linktr.ee/caiodelgadonew) </br>
 Edit by [@bergpb](https://twitter.com/lbergpb)
 
 Contributions are more than welcome!
