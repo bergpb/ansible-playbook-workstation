@@ -1,6 +1,0 @@
----
-php_packages:
-  - php7.4-cli
-  - php7.4-opcache
-  - php7.4-mbstring
-  - php7.4-curl
