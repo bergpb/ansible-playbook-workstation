@@ -10,31 +10,31 @@ ___
 
 > Read the `workstation.yml` file before applying and be sure to understand everything that will be done.
 
-1. Install Ansible
-```bash
-sudo apt update && sudo apt install ansible unzip git -y
-```
-2. Clone this repository
-```bash
-git clone https://github.com/bergpb/ansible-playbook-workstation.git
-```
+1. Install Ansible:
+    ```bash
+    sudo dnf update && sudo dnf install ansible unzip git -y
+    ```
 
-3. Apply the configuration
-```bash
-ansible-playbook workstation.yml --skip-tags chrome,brave --ask-become-pass
-```
+2. Clone this repository:
+    ```bash
+    git clone https://github.com/bergpb/ansible-playbook-workstation.git
+    ```
+
+3. Apply the configuration:
+    ```bash
+    ansible-playbook workstation.yml --ask-become-pass
+    ```
 
 >Type your password when asked to give root permissions for some actions.
 
 
 ### Tags that can be used in playbook:
     - packages
-    - php7.4
     - cli
     - docker
-    - vscodium
-    - browsers (chrome or brave)
-    - polybar
+    - code
+    - virtualbox
+
 ___
 
 # License
