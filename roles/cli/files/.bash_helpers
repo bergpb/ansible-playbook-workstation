@@ -1,24 +1,18 @@
-function con(){
+function oci(){
     case $1 in
-    sophia)
-        ssh pi@192.168.6.112
-    ;;
-    rachel)
-        ssh pi@192.168.6.113
-    ;;
-    cubie)
-        ssh cubie@192.168.6.111
-    ;;
-    anna)
-        ssh pi@192.168.6.110
-    ;;
-    integrator)
-        ssh -i ~/lbarbosa root@162.240.14.34
-    ;;
-    lbarbosa)
-        ssh -i ~/lbarbosa lbarbosa@162.240.14.34
-    ;;
-    *)
-        echo 'Usage con [device]'
+        swarm-1)
+            ssh -i $HOME/.ssh/oci ubuntu@129.146.192.106
+        ;;
+        swarm-2)
+            ssh -i $HOME/.ssh/oci ubuntu@129.153.95.217
+        ;;
+        nomad)
+            ssh -i $HOME/.ssh/oci ubuntu@129.153.107.123
+        ;;
+        oci)
+            ssh -i $HOME/.ssh/oci ubuntu@141.148.180.84
+        ;;
+        *)
+    echo 'Usage oci [swarm-n | nomad | oci]'
     esac
 }

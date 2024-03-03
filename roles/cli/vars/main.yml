@@ -1,3 +1,16 @@
 ---
-vagrant_version: 2.2.19
+asdf_version: v0.14.0
+asdf_node_sersion: 20.11.1
+
 ctop_version: 0.7.7
+kubectl_version: v1.29.1
+kubectl_tools_version: v0.9.5
+minikube_version: v1.32.0
+
+cli_packages:
+- name: ctop
+  url: "https://github.com/bcicen/ctop/releases/download/v{{ ctop_version }}/ctop-{{ ctop_version }}-linux-amd64"
+- name: kubectl
+  url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/{{ (ansible_architecture == 'x86_64') | ternary('amd64', 'arm64') }}/kubectl"
+- name: minikube
+  url: "https://storage.googleapis.com/minikube/releases/{{ minikube_version }}/minikube-linux-{{ (ansible_architecture == 'x86_64') | ternary('amd64', 'arm64') }}"

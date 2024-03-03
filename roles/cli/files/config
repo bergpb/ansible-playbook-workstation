@@ -1,0 +1,24 @@
+Host 192.168.6.*
+  Port 22
+  ServerAliveInterval 60
+  IdentityFile ${HOME}/.ssh/id_ed25519
+
+Host m900
+  HostName 192.168.6.100
+  User bergpb
+
+Host aghata
+  HostName 192.168.6.101
+  User pi
+
+Host avery
+  HostName 192.168.6.102
+  User pi
+
+Host rachel
+  HostName 192.168.6.103
+  User pi
+
+Host natasha
+  HostName 192.168.6.104
+  User pi

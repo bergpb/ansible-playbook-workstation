@@ -1,98 +1,235 @@
 ---
-  - block:
-    - name: Verify if Oh-My-zsh is installed
-      command: test -d /home/{{ ansible_user_id }}/.oh-my-zsh
-      register: ohmyzsh
-      ignore_errors: true
+- block:
+  - name: Verify if zsh is installed
+    ansible.builtin.stat:
+      path: /usr/bin/zsh
+    register: zsh_installed
 
-    - name: Installing Oh-My-zsh
-      shell:
-        cmd: 'curl -fsL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | bash'
-        warn: false
-      when: ohmyzsh.rc != 0
+  - name: Install ZSH
+    become: true
+    ansible.builtin.dnf:
+      name: zsh
+      state: present
+    when: not zsh_installed.stat.exists
 
-    - name: Changing Default Shell to ZSH
-      become: true
-      user:
-        name: '{{ ansible_user_id }}'
-        shell: /bin/zsh
+  - name: Changing Default Shell to ZSH
+    become: true
+    ansible.builtin.user:
+      name: '{{ ansible_user_id }}'
+      shell: /bin/zsh
+    when: not zsh_installed.stat.exists
 
-    - name: Changing Default ZSH Theme to bira
-      lineinfile:
-        path: /home/{{ ansible_user_id }}/.zshrc
-        regexp: '^ZSH_THEME='
-        line: 'ZSH_THEME="bira"'
+  - name: Verify if Oh-My-zsh is installed
+    ansible.builtin.stat:
+      path: "/home/{{ ansible_user_id }}/.oh-my-zsh"
+    register: ohmyzsh_installed
 
-    - name: Clone zsh-autosuggestions repository
-      ansible.builtin.git:
-        repo: 'https://github.com/zsh-users/zsh-autosuggestions'
-        dest: /home/{{ ansible_user_id }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+  - name: Installing Oh-My-zsh
+    ansible.builtin.shell: |
+      set -o pipefail
+      curl -fsSL https://install.ohmyz.sh | sh
+    when: not ohmyzsh_installed.stat.exists
 
-    - name: Add zsh-autosuggestions on ZSH plugins
-      lineinfile:
-        path: /home/{{ ansible_user_id }}/.zshrc
-        regexp: '^plugins='
-        line: 'plugins=(git zsh-autosuggestions)'
+  - name: Changing Default ZSH Theme to bira
+    ansible.builtin.lineinfile:
+      path: /home/{{ ansible_user_id }}/.zshrc
+      regexp: '^ZSH_THEME='
+      line: 'ZSH_THEME="bira"'
+    when: not ohmyzsh_installed.stat.exists
 
-    - name: Creating ZSH Completion folder
-      file:
-        path: /home/{{ ansible_user_id }}/.oh-my-zsh/completions
-        state: directory
-        mode: 0755
+  - name: Clone zsh-autosuggestions repository
+    ansible.builtin.git:
+      repo: 'https://github.com/zsh-users/zsh-autosuggestions'
+      dest: /home/{{ ansible_user_id }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+    when: not ohmyzsh_installed.stat.exists
 
-    - name: Adding autoload to compinit
-      lineinfile:
-        path: /home/{{ ansible_user_id }}/.zshrc
-        line: 'autoload -U compinit && compinit'
-        state: present
+  - name: Add zsh-autosuggestions on ZSH plugins
+    ansible.builtin.lineinfile:
+      path: /home/{{ ansible_user_id }}/.zshrc
+      regexp: '^plugins='
+      line: 'plugins=(git zsh-autosuggestions)'
+    when: not ohmyzsh_installed.stat.exists
 
-    - name: Copy .bash_helpers to home directory
-      copy:
-        src: files/.bash_helpers
-        dest: /home/{{ ansible_user_id }}/.bash_helpers
-        mode: u=rw,g=r,o=r
+  - name: Creating ZSH Completion folder
+    ansible.builtin.file:
+      path: /home/{{ ansible_user_id }}/.oh-my-zsh/completions
+      state: directory
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+      mode: u=rw,g=rw,o=rw
+    when: not ohmyzsh_installed.stat.exists
 
-    - name: Create a batcat symlink
-      file:
-        src: /usr/bin/batcat
-        dest: ~/.local/bin/bat
-        state: link
+  - name: Adding autoload to compinit
+    ansible.builtin.lineinfile:
+      path: /home/{{ ansible_user_id }}/.zshrc
+      line: 'autoload -U compinit && compinit'
+      state: present
+    when: not ohmyzsh_installed.stat.exists
 
-    - name: Add VTE content in .zshrc file
-      blockinfile:
-        path: /home/{{ ansible_user_id }}/.zshrc
-        block: |
-          if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-              source /etc/profile.d/vte-2.91.sh
+  - name: Check if startship is installed
+    ansible.builtin.stat:
+      path: "/home/{{ ansible_user_id }}/.local/bin/starship"
+    register: starship_installed
+
+  - name: Install starship
+    ansible.builtin.shell: curl -sS https://starship.rs/install.sh | sh -s -- --yes -b ~/.local/bin
+    register: starship_install
+    changed_when: starship_install.rc != 0
+    when: not starship_installed.stat.exists
+
+  - name: Copy starship config file
+    ansible.builtin.copy:
+      src: files/starship.toml
+      dest: "/home/{{ ansible_user_id }}/.config/starship.toml"
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+      mode: u=rw,g=r,o=r
+    when: not starship_installed.stat.exists
+
+  - name: Adding starship to .zshrc file
+    ansible.builtin.blockinfile:
+      path: "/home/{{ ansible_user_id }}/.zshrc"
+      append_newline: true
+      prepend_newline: true
+      insertafter: "EOF"
+      marker: "# {mark} STARSHIP ANSIBLE MANAGED BLOCK"
+      state: present
+      block: |
+        # Init starship
+        eval "$(starship init zsh)"
+    when: not starship_installed.stat.exists
+
+  - name: Check if asdf is installed
+    ansible.builtin.stat:
+      path: "/home/{{ ansible_user_id }}/.asdf"
+    register: asdf_installed
+
+  - name: Install asdf
+    ansible.builtin.git:
+      repo: 'https://github.com/asdf-vm/asdf'
+      dest: "/home/{{ ansible_user_id }}/.asdf"
+      version: "{{ asdf_version }}"
+    when: not asdf_installed.stat.exists
+
+  - name: Adding asdf to .zshrc file
+    ansible.builtin.blockinfile:
+      path: "/home/{{ ansible_user_id }}/.zshrc"
+      append_newline: true
+      prepend_newline: true
+      insertafter: "^# User configuration"
+      marker: "# {mark} ASDF ANSIBLE MANAGED BLOCK"
+      state: present
+      block: |
+        # Init ASDF
+        . "$HOME/.asdf/asdf.sh"
+    when: not asdf_installed.stat.exists
+
+  - name: Install asdf NodeJS plugin
+    ansible.builtin.shell:
+      cmd: "asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git"
+    register: result_asdf_plugin_node
+    changed_when: "'already added' not in result_asdf_plugin_node.stdout"
+    failed_when: result_asdf_plugin_node.rc != 0
+
+  - name: "Install NodeJS {{ asdf_node_sersion }} with asdf"
+    ansible.builtin.shell:
+      cmd: "asdf install nodejs {{ asdf_node_sersion }}"
+    register: result_asdf_node
+    changed_when: "'already installed' not in result_asdf_node.stdout"
+    failed_when: result_asdf_node.rc != 0
+
+  - name: Add user custom configuration
+    ansible.builtin.blockinfile:
+      path: "/home/{{ ansible_user_id }}/.zshrc"
+      append_newline: true
+      prepend_newline: true
+      insertafter: "# User configuration"
+      marker: "# {mark} USER ANSIBLE MANAGED BLOCK"
+      state: present
+      block: |
+        # User specific environment
+        if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then
+          PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+        fi
+        export PATH
+
+        # direnv
+        eval "$(direnv hook zsh)"
+
+        # set PATH so it includes user's private ~/.local/bin if it exists
+        if [ -d "$HOME/.local/bin" ] ; then
+          PATH="$HOME/.local/bin:$PATH"
+        fi
+
+        # add bash_helpers file
+        if [ -f $HOME/.bash_helpers ]; then
+          source $HOME/.bash_helpers
+        fi
+
+        # auto activate/deactivate .venv directory if exists
+        function cd() {
+          builtin cd "$@"
+
+          if [[ -z "$VIRTUAL_ENV" ]] ; then
+            ## If env folder is found then activate the vitualenv
+              if [[ -d ./.venv ]] ; then
+                source ./.venv/bin/activate
+              fi
+          else
+            ## check the current folder belong to earlier VIRTUAL_ENV folder
+            # if yes then do nothing
+            # else deactivate
+              parentdir="$(dirname "$VIRTUAL_ENV")"
+              if [[ "$PWD"/ != "$parentdir"/* ]] ; then
+                deactivate
+              fi
           fi
-        marker: "# {mark} ANSIBLE MANAGED BLOCK VTE"
+        }
 
-    - name: Add custom content in .zshrc file
-      blockinfile:
-        path: /home/{{ ansible_user_id }}/.zshrc
-        block: |
-          # set PATH so it includes user's private ~/.local/bin if it exists
-          if [ -d "$HOME/.local/bin" ] ; then
-              PATH="$HOME/.local/bin:$PATH"
-          fi
+        # ENV as development by default
+        export ENV=dev
 
-          if [ -f ~/.bash_helpers ]; then
-              . ~/.bash_helpers
-          fi
-        marker: "# {mark} ANSIBLE MANAGED BLOCK CUSTOM"
+        # Aliases
+        alias k=kubectl
+        alias dc="docker compose -f docker-compose-dev.yml
+        alias activate="source .venv/bin/activate
 
-    - name: Installing Vagrant {{ vagrant_version }}
-      become: true
-      unarchive:
-        src: "https://releases.hashicorp.com/vagrant/{{ vagrant_version }}/vagrant_{{ vagrant_version }}_linux_amd64.zip"
-        dest: /usr/local/bin/vagrant
-        remote_src: yes
+  - name: Copy .bash_helpers file
+    ansible.builtin.copy:
+      src: files/.bash_helpers
+      dest: "/home/{{ ansible_user_id }}/.bash_helpers"
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+      mode: u=rw,g=r,o=r
 
-    - name: Installing ctop
-      become: true
-      get_url:
-        url: "https://github.com/bcicen/ctop/releases/download/v{{ ctop_version }}/ctop-{{ ctop_version }}-linux-amd64"
-        dest: /usr/local/bin/ctop
-        mode: 0755
+  - name: Copy ssh config file
+    ansible.builtin.copy:
+      src: files/config
+      dest: "/home/{{ ansible_user_id }}/.ssh/config"
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+      mode: u=rw,g=r,o=r
 
-    tags: cli
+  - name: Installing cli tools
+    ansible.builtin.get_url:
+      url: "{{ item.url }}"
+      dest: "/home/{{ ansible_user_id }}/.local/bin/{{ item.name }}"
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+      mode: u=rwx,g=rw,o=rw
+    loop: "{{ cli_packages }}"
+
+  - name: Install kubectl + kubens
+    ansible.builtin.unarchive:
+      src: "https://github.com/ahmetb/kubectx/releases/download/{{ kubectl_tools_version }}/{{ item }}_{{ kubectl_tools_version }}_linux_x86_64.tar.gz"
+      dest: "/home/{{ ansible_user_id }}/.local/bin/"
+      remote_src: true
+      include: "{{ item }}"
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+      mode: u=rwx,g=rw,o=rw
+    loop:
+      - kubectx
+      - kubens
+
+  tags: cli
