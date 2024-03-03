@@ -4,9 +4,7 @@
   connection: local
   roles:
     - packages
-    - php7.4
     - cli
     - docker
-    - vscodium
-    - browsers
-    - polybar
+    - code
+    - virtualbox
