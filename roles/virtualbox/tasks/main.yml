@@ -1,0 +1,42 @@
+---
+- block:
+  - name: Install VirtualBox required packages
+    ansible.builtin.dnf:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - '@development-tools'
+      - kernel-devel
+      - kernel-headers
+      - dkms
+      - qt5-qtx11extras
+      - elfutils-libelf-devel
+      - zlib-devel
+
+  - name: Create VirtualBox repository file
+    ansible.builtin.get_url:
+      url: http://download.virtualbox.org/virtualbox/rpm/fedora/virtualbox.repo
+      dest: '/etc/yum.repos.d/virtualbox.repo'
+      force: true
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=r
+
+  - name: Install VirtualBox
+    ansible.builtin.dnf:
+      name: VirtualBox-7.0
+      state: present
+
+  - name: Add user in vboxusers group
+    ansible.builtin.user:
+      name: "{{ ansible_user_id }}"
+      groups: vboxusers
+      append: yes
+
+  - name: Build kernel modules
+    become: true
+    ansible.builtin.command:
+      cmd: /usr/lib/virtualbox/vboxdrv.sh setup
+
+  become: true
+  tags: virtualbox
