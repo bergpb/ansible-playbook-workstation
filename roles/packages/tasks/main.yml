@@ -1,39 +1,27 @@
 ---
-- block:
-  - name: Installing Linux Apps
-    become: true
-    apt:
-      name: '{{ item }}'
-      install_recommends: yes
-      state: present
-    loop: "{{ apt_packages }}" # install packages one by one
-      # - "{{ apt_packages }}" # install all packages at once
-
-  - name: Install deb package from source
-    become: true
-    apt:
-      deb: '{{ item }}'
-      state: present
-    loop: "{{ deb_packages }}"
-
-  - name: Install Spotify Key
-    become: true
-    apt_key:
-      url: 'https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg'
-      state: present
-
-  - name: Install Spotify Repository
-    become: true
-    apt_repository:
-      repo: 'deb http://repository.spotify.com stable non-free'
-      state: present
-      filename: spotify
-
-  - name: Install Spotify
-    become: true
-    apt:
-      name: spotify-client
-      update_cache: true
-      state: present
-
+- name: Install packages
   tags: packages
+  block:
+    - name: Install Fedora packages
+      become: true
+      ansible.builtin.dnf:
+        name: '{{ item }}'
+        state: present
+      loop: "{{ packages_dnf }}" # install packages one by one
+        # - "{{ apt_packages }}" # install all packages at once
+
+    - name: Install Fedora packages from source
+      become: true
+      ansible.builtin.dnf:
+        name: '{{ item }}'
+        state: present
+        disable_gpg_check: true
+      loop: "{{ packages_rpm }}"
+
+    - name: Enable and start services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - sshd

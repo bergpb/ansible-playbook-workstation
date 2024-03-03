@@ -1,5 +1,5 @@
 ---
-apt_packages:
+packages_dnf:
   - vim
   - htop
   - curl
@@ -8,33 +8,27 @@ apt_packages:
   - tree
   - apt-transport-https
   - ca-certificates
+  - openssh-server
   - gnupg
   - python3-pip
   - make
   - git
   - bash-completion
-  - gnupg-agent
   - zsh
   - flameshot
-  - fonts-hack
-  - tilix
-  - virtualbox
   - plocate
   - jq
   - mtr
-  - telegram-desktop
-  - deluge
-  - sqlite3
   - vlc
-  - bottom
   - bat
-  - libarchive-tools
   - neofetch
   - btop
   - httpie
-  - nala
+  - vagrant
+  - solaar
+  - direnv
+  - gnome-tweaks
 
-deb_packages:
-  - https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_0.6.8_amd64.deb
-  - https://github.com/Kong/insomnia/releases/download/core%402022.3.0/Insomnia.Core-2022.3.0.deb
-  - https://github.com/antares-sql/antares/releases/download/v0.5.9/Antares-0.5.9-linux_amd64.deb
+packages_rpm:
+  - https://github.com/ClementTsang/bottom/releases/download/0.9.6/bottom-0.9.6-1.x86_64.rpm
+  - https://github.com/derailed/k9s/releases/download/v0.31.8/k9s_linux_amd64.rpm
