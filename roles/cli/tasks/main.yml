@@ -192,7 +192,7 @@
         # Aliases
         alias k=kubectl
         alias dc="docker compose -f docker-compose-dev.yml
-        alias activate="source .venv/bin/activate
+        alias activate="source .venv/bin/activate"
 
   - name: Copy .bash_helpers file
     ansible.builtin.copy:
